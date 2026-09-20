@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+    xmlns:d="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01"
+    xmlns:tds="http://www.onvif.org/ver10/device/wsdl">
+
+    <SOAP-ENV:Header>
+        <d:MessageID>
+            uuid:12345678-1234-1234-1234-123456789abc
+        </d:MessageID>
+
+        <d:RelatesTo>
+            uuid:aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+        </d:RelatesTo>
+
+        <d:To>
+            http://192.168.3.110:3702
+        </d:To>
+
+        <d:Action>
+            http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ProbeMatches
+        </d:Action>
+    </SOAP-ENV:Header>
+
+    <SOAP-ENV:Body>
+        <d:ProbeMatches>
+
+            <d:ProbeMatch>  
+
+                <d:EndpointReference>
+                    <wsa:Address
+                        xmlns:wsa="http://www.w3.org/2005/08/addressing">
+                        uuid:camera-12345678
+                    </wsa:Address>
+                </d:EndpointReference>
+
+                <d:Types>
+                    tds:Device
+                </d:Types>
+
+                <d:Scopes>
+                    onvif://www.onvif.org/type/video_encoder
+                    onvif://www.onvif.org/type/video_decoder
+                    onvif://www.onvif.org/type/network_video_transmitter
+                    onvif://www.onvif.org/name/MyCamera
+                </d:Scopes>
+
+                <d:XAddrs>
+                    http://192.168.3.120/onvif/device_service
+                </d:XAddrs>
+
+                <d:MetadataVersion>
+                    1
+                </d:MetadataVersion>
+
+            </d:ProbeMatch>
+
+        </d:ProbeMatches>
+    </SOAP-ENV:Body>
+
+</SOAP-ENV:Envelope>========================================
+
+
+========================================
+From: 0.0.0.0
+Received: -1 bytes
+========================================
+
+========================================
+From: 0.0.0.0
+Received: -1 bytes
+========================================
+
+========================================
+From: 0.0.0.0
+Received: -1 bytes
+========================================
+
