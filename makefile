@@ -1,27 +1,30 @@
 CXX = g++
 
-CXXFLAGS = -Wall -Wextra -g -std=c++11
+CXXFLAGS = -Wall -Wextra -g -std=c++11 \
+           -static-libgcc \
+           -static-libstdc++
 
 INCLUDES = \
-    -I. \
-	-IOnvifXml\
-
+	-I. \
+	-IOnvifXml \
+	-IXmlParse \
+	-INetwork
 
 SOURCES = \
-    main.cpp \
-
+	main.cpp \
+	XmlParse/pugixml.cpp \
+	Network/UdpSendProbe.cpp \
+	Network/TcpSendSoap.cpp
 
 LIBS = \
-    -lws2_32 \
-    -lbcrypt
+	-lws2_32 \
+	-lbcrypt
 
 TARGET = main.exe
-
 
 all:
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SOURCES) -o $(TARGET) $(LIBS)
 
-
 clean:
-	rm -f $(TARGET)
-	rm -f ProbeMatch_*.txt
+	del /Q $(TARGET) 2>nul
+	del /Q ProbeMatch_*.txt 2>nul

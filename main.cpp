@@ -1,92 +1,40 @@
 #include <stdio.h>
 #include <string.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include "OnvifTransaction.h"
+#include "pugixml.hpp"
+#include <iostream>
 #include "Probe.h"
 
 int main(void)
 {
-    FILE *file = fopen("ProbeMatch.txt", "a");
+    printf("1");
+    OpenUdpSocketAndTransProbe(ProbeMessage, "192.168.1.153", 9999);
 
-    WSADATA wsaData;
+    printf("1");
+    pugi::xml_document doc;
+    doc.load_file("ProbeMatch.xml");
+    pugi::xml_node envelope = doc.child("SOAP-ENV:Envelope");
+    pugi::xml_node body = envelope.child("SOAP-ENV:Body");
+    pugi::xml_node probematches = body.child("d:ProbeMatches");
+    pugi::xml_node probematch = probematches.child("d:ProbeMatch");
+    pugi::xml_node xaddrs = probematch.child("d:XAddrs");
 
-    WSAStartup(MAKEWORD(2, 2), &wsaData);
+    std::string xaddr = xaddrs.child_value();
 
-    SOCKET UdpSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    size_t start = xaddr.find_first_not_of(" \t\r\n");
+    size_t end = xaddr.find_last_not_of(" \t\r\n");
 
-    if (UdpSock == INVALID_SOCKET)
+    if (start != std::string::npos)
     {
-        printf(
-            "socket() failed: %d\n",
-            WSAGetLastError());
-
-        WSACleanup();
-        return 1;
+        xaddr = xaddr.substr(start, end - start + 1);
     }
 
-    sockaddr_in localAddr = {};
-    localAddr.sin_family = AF_INET;
-    localAddr.sin_port = htons(9999);
-    localAddr.sin_addr.s_addr = INADDR_ANY;
+    const char *ptr = xaddr.c_str();
 
-    bind(UdpSock, (sockaddr *)&localAddr, sizeof(localAddr));
+    printf("%s\n", ptr);
 
-    in_addr localInterface = {};
-    inet_pton(AF_INET, "192.168.3.110", &localInterface);
-    setsockopt(UdpSock, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&localInterface, sizeof(localInterface));
+    OpenTcpSockerAndTransSoap(GetDateAndTime, "192.168.1.200", 2020);
 
-    sockaddr_in multicastAddr = {};
-    multicastAddr.sin_family = AF_INET;
-    multicastAddr.sin_port = htons(3702);
-
-    inet_pton(AF_INET, "239.255.255.250", &multicastAddr.sin_addr);
-
-    sendto(UdpSock, ProbeMessage, strlen(ProbeMessage), 0, (sockaddr *)&multicastAddr, sizeof(multicastAddr));
-
-    char buffer[8192];
-
-    while (1)
-    {
-        sockaddr_in senderAddr = {};
-        int senderAddrLen = sizeof(senderAddr);
-
-        int received = recvfrom(UdpSock, buffer, sizeof(buffer) - 1, 0, (sockaddr *)&senderAddr, &senderAddrLen);
-
-        buffer[received] = '\0';
-
-        fprintf(
-            file,
-            "========================================\n");
-
-        fprintf(file, "From: %s\n", inet_ntoa(senderAddr.sin_addr));
-
-        fprintf(file, "Received: %d bytes\n", received);
-
-        fprintf(file, "========================================\n");
-
-        fprintf(file, "%s\n", buffer);
-
-        fflush(file);
-    }
-
-    fclose(file);
-
-    SOCKET TcpSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (TcpSock == INVALID_SOCKET)
-    {
-        printf("Cannot build Tcp socket");
-    }
-
-    sockaddr_in ServerAddr = {};
-    localAddr.sin_family = AF_INET;
-    localAddr.sin_port = htons(2020);
-
-    inet_pton(AF_INET, "192.168.1.200", &ServerAddr.sin_addr);
-    connect(TcpSock, (sockaddr *)&ServerAddr, sizeof(ServerAddr));
-    printf("TCP connected successfully\n");
-
-    closesocket(TcpSock);
-    closesocket(UdpSock);
     WSACleanup();
 
     return 0;

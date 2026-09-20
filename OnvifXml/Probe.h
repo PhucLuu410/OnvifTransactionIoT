@@ -35,4 +35,16 @@ const char *ProbeMessage =
 
     "</e:Envelope>";
 
+const char *GetDateAndTime =
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    "<e:Envelope "
+    "xmlns:e=\"http://www.w3.org/2003/05/soap-envelope\" "
+    "xmlns:w=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" "
+    "xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" "
+    "xmlns:tds=\"http://www.onvif.org/ver10/device/wsdl\">"
+    "<e:Body>"
+    "<tds:GetSystemDateAndTime/>"
+    "</e:Body>"
+    "</e:Envelope>";
+
 #endif
