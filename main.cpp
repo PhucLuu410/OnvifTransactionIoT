@@ -12,9 +12,9 @@ int main(void)
 
     WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-    SOCKET sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    SOCKET UdpSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-    if (sock == INVALID_SOCKET)
+    if (UdpSock == INVALID_SOCKET)
     {
         printf(
             "socket() failed: %d\n",
@@ -29,11 +29,11 @@ int main(void)
     localAddr.sin_port = htons(9999);
     localAddr.sin_addr.s_addr = INADDR_ANY;
 
-    bind(sock, (sockaddr *)&localAddr, sizeof(localAddr));
+    bind(UdpSock, (sockaddr *)&localAddr, sizeof(localAddr));
 
     in_addr localInterface = {};
-    inet_pton(AF_INET, "192.168.1.153", &localInterface);
-    setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&localInterface, sizeof(localInterface));
+    inet_pton(AF_INET, "192.168.3.110", &localInterface);
+    setsockopt(UdpSock, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&localInterface, sizeof(localInterface));
 
     sockaddr_in multicastAddr = {};
     multicastAddr.sin_family = AF_INET;
@@ -41,7 +41,7 @@ int main(void)
 
     inet_pton(AF_INET, "239.255.255.250", &multicastAddr.sin_addr);
 
-    sendto(sock, ProbeMessage, strlen(ProbeMessage), 0, (sockaddr *)&multicastAddr, sizeof(multicastAddr));
+    sendto(UdpSock, ProbeMessage, strlen(ProbeMessage), 0, (sockaddr *)&multicastAddr, sizeof(multicastAddr));
 
     char buffer[8192];
 
@@ -50,7 +50,7 @@ int main(void)
         sockaddr_in senderAddr = {};
         int senderAddrLen = sizeof(senderAddr);
 
-        int received = recvfrom(sock, buffer, sizeof(buffer) - 1, 0, (sockaddr *)&senderAddr, &senderAddrLen);
+        int received = recvfrom(UdpSock, buffer, sizeof(buffer) - 1, 0, (sockaddr *)&senderAddr, &senderAddrLen);
 
         buffer[received] = '\0';
 
@@ -70,7 +70,23 @@ int main(void)
     }
 
     fclose(file);
-    closesocket(sock);
+
+    SOCKET TcpSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (TcpSock == INVALID_SOCKET)
+    {
+        printf("Cannot build Tcp socket");
+    }
+
+    sockaddr_in ServerAddr = {};
+    localAddr.sin_family = AF_INET;
+    localAddr.sin_port = htons(2020);
+
+    inet_pton(AF_INET, "192.168.1.200", &ServerAddr.sin_addr);
+    connect(TcpSock, (sockaddr *)&ServerAddr, sizeof(ServerAddr));
+    printf("TCP connected successfully\n");
+
+    closesocket(TcpSock);
+    closesocket(UdpSock);
     WSACleanup();
 
     return 0;
