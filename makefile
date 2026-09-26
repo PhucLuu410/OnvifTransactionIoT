@@ -36,6 +36,11 @@ all:
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SOURCES) -o $(TARGET) $(LIBS)
 
 clean:
+<<<<<<< HEAD
 	rm -f $(TARGET)
 	rm -f *.o
 	rm -rf hls
+=======
+	del /Q $(TARGET) 2>nul
+	del /Q ProbeMatch_*.txt 2>nul
+>>>>>>> 94645b30c35a73e97a048f439104d64bf4715a0a
